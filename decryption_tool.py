@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
 import argparse
+from cgi import print_form
 import math
+from multiprocessing import parent_process
 import shutil
 import os
 import zlib
 from mmap import mmap, PROT_READ
 from Crypto.Cipher import AES
 
-__author__      = "Michael Niewöhner"
-__copyright__   = "Copyright 2020, Michael Niewöhner"
+__author__      = "Michael Niewöhner, Zitai Chen"
+__copyright__   = "Copyright 2020, Michael Niewöhner, Zitai Chen"
 __license__     = "GPLv2"
 
 
@@ -72,9 +74,19 @@ def extract_keys(mm):
         return ret
 
 def decrypt_header(mm, header):
+    print(header)
     mm.seek(header['offset'])
-    cipher = AES.new(header['key'], AES.MODE_CBC, iv=header['iv'])
+    cipher = AES.new(header['key'], AES.MODE_CBC, header['iv'])
     ret = cipher.decrypt(mm.read(header['enc_hdr_len']))
+
+    return ret
+
+def encrypt_header(mm, header):
+    print(header)
+    mm.seek(header['offset'])
+    # We are reusing iv, but we don't care
+    cipher = AES.new(header['key'], AES.MODE_CBC, header['iv'])     
+    ret = cipher.encrypt(mm.read(header['enc_hdr_len']))
 
     return ret
 
@@ -88,17 +100,36 @@ def write_header(mm, header, data):
 def decrypt_image(infile, outfile):
     shutil.copyfile(infile, outfile)
     with open(outfile, "r+b") as f,\
-         mmap(f.fileno(), 0) as mm:
-            regions = extract_keys(mm)
-            for reg in regions.values():
-                dec = decrypt_header(mm, reg)
-                write_header(mm, reg, dec)
+            mmap(f.fileno(), 0) as mm:
+        regions = extract_keys(mm)
+        for reg in regions.values():
+            dec = decrypt_header(mm, reg)
+            write_header(mm, reg, dec)
+
+def encrypt_image(infile, outfile):
+    shutil.copyfile(infile, outfile)
+    with open(outfile, "r+b") as f,\
+            mmap(f.fileno(), 0) as mm:
+        regions = extract_keys(mm)
+        for reg in regions.values():
+            enc = encrypt_header(mm, reg)
+            write_header(mm, reg, enc)
+
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Decrypt Supermicro BMC firmware images.')
+    parser = argparse.ArgumentParser(
+        description='De/Encrypt Supermicro BMC firmware images.\n \
+        default is decrypt')
     parser.add_argument('infile', help='file to decrypt')
     parser.add_argument('outfile', help='output')
+    parser.add_argument('-e', '--encrypt', action='store_true', help='encrypt')
     args = parser.parse_args()
 
-    decrypt_image(args.infile, args.outfile)
+    if args.encrypt:
+        print("Encrypting image...")
+        encrypt_image(args.infile, args.outfile)
+    else:
+        print("Decrypting image...")
+        decrypt_image(args.infile, args.outfile)
+        pass

@@ -1,9 +1,15 @@
 # Supermicro BMC firmware image decryptor
 
+Supermicro BMC firmware images tool
+original repo: https://github.com/c0d3z3r0/smcbmc
+
+This repoo has added the following features:
+* encrypt the firmware image
+
+
 This tiny tool can decrypt Supermicro BMC firmware images by first reading the
 keys from `libipmi.so` inside the rootfs, then decrypting the headers of the
 three regions rootfs, webfs and metadata.
-
 
 
 ## Questions & Answers
@@ -14,6 +20,7 @@ Just provide the encrypted image as input and a filename for the decrypted
 image:
 
 ~~~sh
+pip3 install -r requirements.txt
 ./smcbmc.py SMT_X11_xyz.bin decrypted.bin
 ~~~
 
@@ -65,6 +72,7 @@ Uhm, nope.
 ## License
 
 Copyright (C) 2020 Michael Niewöhner
+Copyright (C) 2022 Zitai Chen
 
 This is open source software, licensed under GPLv2. Refer to the license header
 in each covered file. See [LICENSE](LICENSE) for the full license.
