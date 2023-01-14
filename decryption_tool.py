@@ -10,8 +10,8 @@ import zlib
 from mmap import mmap, PROT_READ
 from Crypto.Cipher import AES
 
-__author__      = "Michael Niewöhner, Zitai Chen"
-__copyright__   = "Copyright 2020, Michael Niewöhner, Zitai Chen"
+__author__      = "Michael Niewöhner, Author"
+__copyright__   = "Copyright 2020, Michael Niewöhner, Author"
 __license__     = "GPLv2"
 
 

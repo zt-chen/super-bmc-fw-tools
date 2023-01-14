@@ -72,7 +72,7 @@ Uhm, nope.
 ## License
 
 Copyright (C) 2020 Michael Niewöhner
-Copyright (C) 2022 Zitai Chen
+Copyright (C) 2022 Author
 
 This is open source software, licensed under GPLv2. Refer to the license header
 in each covered file. See [LICENSE](LICENSE) for the full license.
